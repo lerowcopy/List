@@ -9,12 +9,15 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.Vector;
 
-public class EditUserWindow extends JFrame {
+public class EditUserWindow extends JPanel {
+
 
     public EditUserWindow (Vector<String> user) {
+        Application application = Application.instance;
+
         setLayout(new GridBagLayout());
         setSize(300, 400);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setVisible(true);
 
         JTextField name = new JTextField(user.get(1));
         JTextField phone = new JTextField(user.get(2));
@@ -54,13 +57,16 @@ public class EditUserWindow extends JFrame {
 
         add(save, gbc);
 
-        cancel.addActionListener(e -> dispose());
+        cancel.addActionListener(e -> {
+            application.remove(this);
+            application.setSize(300, 500);
+            application.add(application.mainPanel);
+        });
 
         save.addActionListener(e -> {
             try {
                 DataBase.updateUser(new User(user.get(1), user.get(2)), name.getText());
-                Application.instance.addList();
-                dispose();
+                Application.addList();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }

@@ -10,12 +10,13 @@ import java.util.Vector;
 
 import Application.Application;
 
-public class NewUserWindow extends JFrame {
+public class NewUserWindow extends JPanel {
     public JTextField name = new JTextField();
     public JLabel nameL = new JLabel("Name");
     Vector<JTextField> phones = new Vector<>();
     public JTextField phone = new JTextField();
     public JLabel phoneL = new JLabel("Phone");
+    private final Application application;
     GridBagConstraints gbc;
 
 
@@ -24,9 +25,13 @@ public class NewUserWindow extends JFrame {
     public JButton cancel = new JButton("Cancel");
     public int indexPhone = 0;
 
+
     public NewUserWindow (){
+        application = Application.instance;
         setLayout(new GridBagLayout());
         setSize(300, 300);
+        setVisible(true);
+
         phones.add(phone);
         gbc = new GridBagConstraints(
                 0, 0, 3, 1, 1, 1,
@@ -81,17 +86,20 @@ public class NewUserWindow extends JFrame {
 
         add(save, gbc);
 
-        cancel.addActionListener(e -> dispose());
+        cancel.addActionListener(e -> {
+            application.remove(this);
+            application.setSize(300, 500);
+            application.add(application.mainPanel);
+        });
 
         save.addActionListener(e -> {
             User person = new User(name.getText(), phone.getText());
             try {
                 DataBase.addUser(person);
-                Application.instance.addList();
+                Application.addList();
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
-            dispose();
         });
 
         newPhone.addActionListener(e -> {
