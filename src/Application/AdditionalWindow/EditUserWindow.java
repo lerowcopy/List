@@ -1,26 +1,33 @@
 package Application.AdditionalWindow;
 
-import Application.Application;
-import Application.DataBase.DataBase;
-import Application.Users.User;
+import Application.AdditionalWindow.Action.ForEditPanel.AddActionForEdit;
+import Application.AdditionalWindow.Action.ForEditPanel.CancelActionForEdit;
+import Application.AdditionalWindow.Action.ForEditPanel.ListMouseAdapterForEdit;
+import Application.AdditionalWindow.Action.ForEditPanel.NewContactActionForEdit;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.Vector;
 
 public class EditUserWindow extends JPanel {
 
+    public Vector<String> contact;
+    public Vector<String> contactsType;
+    public JList<String> contactsList = new JList<>();
+    public JTextField name;
+    public JButton add = new JButton("Add new contact");
+    public static EditUserWindow instance;
+    public EditUserWindow (String nameE, Vector<String> contactE, Vector<String> contactsTypeE) {
+        instance = this;
 
-    public EditUserWindow (Vector<String> user) {
-        Application application = Application.instance;
+        contact = contactE;
+        contactsType = contactsTypeE;
 
         setLayout(new GridBagLayout());
         setSize(300, 400);
         setVisible(true);
 
-        JTextField name = new JTextField(user.get(1));
-        JTextField phone = new JTextField(user.get(2));
+        name = new JTextField(nameE);
 
         JButton cancel = new JButton("Cancel");
         JButton save = new JButton("Save");
@@ -34,15 +41,24 @@ public class EditUserWindow extends JPanel {
         add(name, gbc);
 
         gbc = new GridBagConstraints(
-                0, 1, 2, 1, 1, 1,
+                0, 1, 2, 1, 1, 5,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(1, 5, 1, 5), 0, 0
         );
 
-        add(phone, gbc);
+        contactsList.setListData(contact);
+        add(contactsList, gbc);
 
         gbc = new GridBagConstraints(
-                0, 2, 1, 1, 1, 1,
+                0, 2, 2, 1, 1, 1,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(1, 5, 1, 5), 0, 0
+        );
+
+        add(add, gbc);
+
+        gbc = new GridBagConstraints(
+                0, 3, 1, 1, 1, 1,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(1, 5, 1, 5), 0, 0
         );
@@ -50,26 +66,16 @@ public class EditUserWindow extends JPanel {
         add(cancel, gbc);
 
         gbc = new GridBagConstraints(
-                1, 2, 1, 1, 1, 1,
+                1, 3, 1, 1, 1, 1,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(1, 5, 1, 5), 0, 0
         );
 
         add(save, gbc);
 
-        cancel.addActionListener(e -> {
-            application.remove(this);
-            application.setSize(300, 500);
-            application.add(application.mainPanel);
-        });
-
-        save.addActionListener(e -> {
-            try {
-                DataBase.updateUser(new User(user.get(1), user.get(2)), name.getText());
-                Application.addList();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        cancel.addActionListener(new CancelActionForEdit());
+        contactsList.addMouseListener(new ListMouseAdapterForEdit());
+        add.addActionListener(new NewContactActionForEdit());
+        save.addActionListener(new AddActionForEdit());
     }
 }

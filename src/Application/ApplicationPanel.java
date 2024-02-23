@@ -16,6 +16,7 @@ public class ApplicationPanel extends JPanel {
     private final JButton editUser = new JButton("edit");
 
     private final Application application;
+    public static ApplicationPanel instance;
 
     GridBagConstraints gbc;
 
@@ -23,8 +24,9 @@ public class ApplicationPanel extends JPanel {
         DataBase dataBase = new DataBase();
         dataBase.connect();
         application = Application.instance;
+        instance = this;
 
-        setSize(300, 800);
+        setSize(300, 250);
         setLayout(new GridBagLayout());
 
         gbc = new GridBagConstraints(
@@ -40,11 +42,8 @@ public class ApplicationPanel extends JPanel {
 
             list = new JList<>(users);
 
-            panel.add(list, BorderLayout.CENTER);
         }
-        else{
-            panel.add(list, BorderLayout.CENTER);
-        }
+        panel.add(list, BorderLayout.CENTER);
 
         gbc = new GridBagConstraints(
                 0, 6, 1, 1, 1, 1,
@@ -78,7 +77,7 @@ public class ApplicationPanel extends JPanel {
 
         newUser.addActionListener(e -> {
             application.add(application.newUserWindow);
-            application.remove(application.mainPanel);
+            application.remove(Application.mainPanel);
             application.setSize(300, 250);
         });
 
@@ -97,17 +96,32 @@ public class ApplicationPanel extends JPanel {
         });
 
         editUser.addActionListener(e -> {
+            Vector<String> contacts;
+            Vector<String> contactsType;
             Vector<String> users;
             try {
                 users = DataBase.SelectUsers();
-                application.editUserWindow = new EditUserWindow(DataBase.selectUser(users.get(list.getSelectedIndex())));
+                String name = users.get(list.getSelectedIndex());
+                Vector<Vector<String>> data = DataBase.getContactByName(users.get(list.getSelectedIndex()));
+                contacts = data.get(0);
+                contactsType = data.get(1);
+                application.editUserWindow = new EditUserWindow(name, contacts, contactsType);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
             application.add(application.editUserWindow);
-            application.remove(application.mainPanel);
-            application.setSize(300, 400);
+            application.remove(Application.mainPanel);
+            application.setSize(300, 250);
 
         });
     }
+
+    public static void addList() throws SQLException {
+        Vector<String> users = DataBase.SelectUsers();
+
+        list.setListData(users);
+
+        panel.updateUI();
+    }
+
 }
