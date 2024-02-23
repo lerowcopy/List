@@ -52,8 +52,20 @@ public class DataBase {
     }
 
     public static void deleteUser(String name) throws SQLException {
-        String sql = String.format("DELETE FROM users WHERE name = '%s'", name);
+        String sql = String.format("SELECT id FROM users WHERE name = '%s'", name);
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet resultSet = ps.executeQuery();
+        int indexUser;
+
+        indexUser = resultSet.getInt(1);
+
+        sql = String.format("DELETE FROM contact WHERE idP = %d", indexUser);
         execute(sql);
+
+        sql = String.format("DELETE FROM users WHERE name = '%s'", name);
+        execute(sql);
+
+
     }
 
     public static Vector<Vector<String>> getContactByName(String name) throws SQLException {
@@ -120,10 +132,10 @@ public class DataBase {
         }
     }
 
-    public static void updateUser (String name, Vector<String> contacts, Vector<String> idContactsToAdd) throws SQLException{
+    public static void updateUser (String saveName, String name, Vector<String> contacts, Vector<String> idContactsToAdd) throws SQLException{
         int indexUser;
 
-        String sql = String.format("SELECT id FROM users WHERE name = '%s'", name);
+        String sql = String.format("SELECT id FROM users WHERE name = '%s'", saveName);
         PreparedStatement ps = con.prepareStatement(sql);
         ResultSet resultSet = ps.executeQuery();
         indexUser = resultSet.getInt(1);
@@ -135,6 +147,9 @@ public class DataBase {
             sql = String.format("INSERT INTO contact (type, contact, idP) VALUES ('%s', '%s', %d)", idContactsToAdd.get(i), contacts.get(i), indexUser);
             execute(sql);
         }
+
+        sql = String.format("UPDATE users SET name = '%s' WHERE name = '%s'", name, saveName);
+        execute(sql);
 
     }
 }
