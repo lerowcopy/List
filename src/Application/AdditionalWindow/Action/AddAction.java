@@ -18,7 +18,7 @@ public class AddAction implements ActionListener {
             DataBase.addUser(newUserInstance.name.getText() ,newUserInstance.contacts, newUserInstance.contactTypesToAdd);
             application.remove(newUserInstance);
             application.add(Application.mainPanel);
-            application.setSize(300, 800);
+            application.setSize(300, 300);
             ApplicationPanel.addList();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);

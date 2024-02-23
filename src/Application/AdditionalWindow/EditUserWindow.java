@@ -15,9 +15,11 @@ public class EditUserWindow extends JPanel {
     public Vector<String> contactsType;
     public JList<String> contactsList = new JList<>();
     public JTextField name;
+    public String saveName;
     public JButton add = new JButton("Add new contact");
     public static EditUserWindow instance;
     public EditUserWindow (String nameE, Vector<String> contactE, Vector<String> contactsTypeE) {
+        saveName = nameE;
         instance = this;
 
         contact = contactE;
